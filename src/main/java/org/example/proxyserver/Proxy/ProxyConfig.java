@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ProxyConfig {
+    public static final String FILENAME = "config.json";
+
     public static final String SERVER_ID = "ServerID";
     public static final String LISTEN_ADDRESSES = "ListenAddresses";
     public static final String LISTEN_PORT = "ListenPort";
@@ -17,21 +19,29 @@ public class ProxyConfig {
     public static final String SIZE_LIMIT = "SizeLimit";
     public static final String ALLOWED_IP_ADDRESSES = "AllowedIPAdresses";
 
+    private static volatile ProxyConfig config;
     private final JSONObject jsonData;
 
     private ProxyConfig(JSONObject jsonData) {
         this.jsonData = jsonData;
     }
 
-    public static ProxyConfig getConfig(String filename) throws IOException, ConfigException {
-        String content = new String(Files.readAllBytes(Paths.get(filename)));
+    public static ProxyConfig getConfig() throws IOException, ConfigException {
+        ProxyConfig result = config;
+        if (result != null) {
+            return result;
+        }
+        synchronized(ProxyConfig.class) {
+            if (config == null) {
+                String content = new String(Files.readAllBytes(Paths.get(FILENAME)));
 
-        JSONObject json = new JSONObject(content);
-        ProxyConfig config = new ProxyConfig(json);
+                JSONObject json = new JSONObject(content);
 
-        validate(config);
-
-        return config;
+                config = new ProxyConfig(json);
+                validate(config);
+            }
+            return config;
+        }
     }
 
     private static void validate(ProxyConfig config) throws ConfigException {
