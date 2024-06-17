@@ -3,8 +3,9 @@ package org.example.proxyserver;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import org.example.proxyserver.Proxy.Exceptions.ValidationException;
+import org.example.proxyserver.Proxy.Exceptions.ConfigException;
 import org.example.proxyserver.Proxy.ProxyConfig;
+import org.example.proxyserver.Proxy.ProxyServerManager;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,8 +25,12 @@ public class FXController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            config = ProxyConfig.getConfig("config.json");
-        } catch (IOException | ValidationException e) {
+            config = ProxyConfig.getConfig();
+
+            ProxyServerManager manager = new ProxyServerManager(this, config);
+
+            manager.run();
+        } catch (IOException | ConfigException e) {
             throw new RuntimeException(e);
         }
     }
