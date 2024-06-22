@@ -26,19 +26,23 @@ public class ProxyConfig {
         this.jsonData = jsonData;
     }
 
-    public static ProxyConfig getConfig() throws IOException, ConfigException {
+    public static ProxyConfig getConfig() {
         ProxyConfig result = config;
         if (result != null) {
             return result;
         }
         synchronized(ProxyConfig.class) {
             if (config == null) {
+                try {
                 String content = new String(Files.readAllBytes(Paths.get(FILENAME)));
 
                 JSONObject json = new JSONObject(content);
 
                 config = new ProxyConfig(json);
                 validate(config);
+                } catch (ConfigException | IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
             return config;
         }

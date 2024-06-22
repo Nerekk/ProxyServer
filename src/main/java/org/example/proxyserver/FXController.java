@@ -30,7 +30,7 @@ public class FXController implements Initializable {
             ProxyServerManager manager = new ProxyServerManager(this, config);
 
             manager.run();
-        } catch (IOException | ConfigException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
