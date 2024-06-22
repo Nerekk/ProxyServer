@@ -1,6 +1,6 @@
-package org.example.proxyserver.Proxy;
+package org.example.proxyserver.Proxy.Config;
 
-import org.example.proxyserver.Proxy.Exceptions.ConfigException;
+import org.example.proxyserver.Proxy.Config.Exceptions.ConfigException;
 import org.json.JSONObject;
 
 import java.util.regex.Matcher;
