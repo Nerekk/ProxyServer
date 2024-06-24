@@ -1,24 +1,31 @@
 package org.example.proxyserver.Threads;
 
+import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
+import org.example.proxyserver.Proxy.Config.ProxyConfig;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProxyServerThread extends Thread {
     private final ServerSocket listenerSocket;
-    private List<Socket> clients;
-    private volatile boolean STOP_SERVER;
-    private volatile boolean STOP_CLIENT;
+    private final ProxyResources resources;
 
-    public ProxyServerThread(ServerSocket serverSocket, boolean STOP_SERVER) throws IOException {
+//    private List<Socket> clients;
+    private final AtomicBoolean STOP_SERVER;
+    private AtomicBoolean STOP_CLIENT;
+
+    public ProxyServerThread(ServerSocket serverSocket, ProxyResources resources, AtomicBoolean STOP_SERVER) {
         this.listenerSocket = serverSocket;
+        this.resources = resources;
         this.STOP_SERVER = STOP_SERVER;
     }
 
     public void run() {
-        STOP_CLIENT = false;
-        while (!STOP_SERVER) {
+        STOP_CLIENT = new AtomicBoolean(false);
+        while (!STOP_SERVER.get()) {
             try {
                 handleAccept();
             } catch (IOException e) {
@@ -36,14 +43,15 @@ public class ProxyServerThread extends Thread {
         // SPRAWDZ CZY NALEZY DO ALLOWED IP ADDRESSES
 
         System.out.println("## [" + listenerSocket.getInetAddress() + "] Client accepted: " + clientSocket.getInetAddress());
-        clients.add(clientSocket);
+        clientSocket.setSoTimeout(ProxyConfig.getConfig().getTimeOut());
+//        clients.add(clientSocket);
 
-        ClientHandler clientHandler = new ClientHandler(clientSocket, STOP_CLIENT);
+        ClientHandler clientHandler = new ClientHandler(clientSocket, resources, STOP_CLIENT);
         clientHandler.start();
     }
 
     private void close() {
-        STOP_CLIENT = true;
+        STOP_CLIENT.set(true);
         try {
             listenerSocket.close();
         } catch (IOException e) {
