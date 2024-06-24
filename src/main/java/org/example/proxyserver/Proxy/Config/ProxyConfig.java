@@ -1,7 +1,7 @@
 package org.example.proxyserver.Proxy.Config;
 
 
-import org.example.proxyserver.Proxy.Config.Exceptions.ConfigException;
+import org.example.proxyserver.Exceptions.ConfigException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

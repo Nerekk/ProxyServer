@@ -1,4 +1,4 @@
-package org.example.proxyserver.Proxy.Config.Exceptions;
+package org.example.proxyserver.Exceptions;
 
 public class ConfigException extends Exception {
     public ConfigException(String message) {
