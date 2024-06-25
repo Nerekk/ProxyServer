@@ -2,13 +2,11 @@ package org.example.proxyserver.Proxy.Com_resources.Transfer;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class Payload {
     private LocalDateTime timestampOfMessage;
     private String topicOfMessage;
@@ -20,5 +18,12 @@ public class Payload {
         this.topicOfMessage = topicOfMessage;
         this.success = success;
         this.message = message;
+    }
+
+    public Payload() {
+        this.timestampOfMessage = LocalDateTime.now();
+        this.topicOfMessage = "";
+        this.success = true;
+        this.message = "";
     }
 }

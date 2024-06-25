@@ -8,26 +8,22 @@ import org.example.proxyserver.Proxy.Com_resources.MessageReceived;
 import org.example.proxyserver.Proxy.Com_resources.MessageToSend;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
 import org.example.proxyserver.Proxy.Com_resources.Transfer.MessageTransferObject;
-import org.example.proxyserver.Proxy.Monitoring_utils.Types.Message;
-import org.example.proxyserver.Proxy.Monitoring_utils.Types.Register;
-import org.example.proxyserver.Proxy.Monitoring_utils.Types.Status;
-import org.example.proxyserver.Proxy.Monitoring_utils.Types.Withdraw;
+import org.example.proxyserver.Proxy.Monitoring_utils.Types.*;
 import org.example.proxyserver.Proxy.Utils.MTOJsonParser;
 
 public class MessageManager {
     private final ProxyResources resources;
-    private final MTOJsonParser parser;
 
-    private final TypeHandler register, withdraw, message, status;
+    private final TypeHandler register, withdraw, message, status, config;
 
     public MessageManager(ProxyResources resources) {
         this.resources = resources;
-        this.parser = new MTOJsonParser();
 
         this.register = new Register(resources);
         this.withdraw = new Withdraw(resources);
         this.message = new Message(resources);
         this.status = new Status(resources);
+        this.config = new Config(resources);
     }
 
     public void handleMessageReceived() {
@@ -53,7 +49,7 @@ public class MessageManager {
         MessageTransferObject mto;
 
         try {
-            mto = parser.parseJsonToMessageTransferObject(data);
+            mto = MTOJsonParser.parseJsonToMessageTransferObject(data);
         } catch (JsonParseException | IllegalArgumentException e) {
             // blad json
             throw new MessageException(e.getMessage());
@@ -69,13 +65,13 @@ public class MessageManager {
             case withdraw -> {
                 return handleType(withdraw, messageReceived);
             }
-//            case reject -> reject(messageReceived);
-//            case acknowledge -> acknowledge(messageReceived);
             case message -> {
                 return handleType(message, messageReceived);
             }
 //            case file -> file(messageReceived);
-//            case config -> config(messageReceived);
+            case config -> {
+                return handleType(config, messageReceived);
+            }
             case status -> {
                 return handleType(status, messageReceived);
             }
@@ -97,8 +93,7 @@ public class MessageManager {
         } else if (mode == MessageMode.subscriber) {
             result = type.handleSubscriberMode(messageReceived);
         } else {
-            // TODO nieznany mode
-            result = null;
+            result = Feedback.getReject(messageReceived, "Unknown mode");
         }
         return result;
     }

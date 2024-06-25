@@ -1,17 +1,21 @@
 package org.example.proxyserver.Threads;
 
+import org.example.proxyserver.Enums.MessageMode;
 import org.example.proxyserver.Enums.MessageType;
 import org.example.proxyserver.Proxy.Client;
 import org.example.proxyserver.Proxy.Com_resources.MessageReceived;
 import org.example.proxyserver.Proxy.Com_resources.MessageToSend;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
 import org.example.proxyserver.Proxy.Com_resources.Transfer.MessageTransferObject;
+import org.example.proxyserver.Proxy.Com_resources.Transfer.Payload;
+import org.example.proxyserver.Proxy.Config.ProxyConfig;
 import org.example.proxyserver.Proxy.Monitoring_utils.Feedback;
 import org.example.proxyserver.Proxy.Utils.MTOJsonParser;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientHandler extends Thread {
@@ -37,9 +41,15 @@ public class ClientHandler extends Thread {
             String jsonData;
             try {
                 jsonData = in.readUTF();
+
+                if (isMessageTooBig(jsonData)) {
+                    sendRejectToClient();
+                    continue;
+                }
+
                 System.out.println(jsonData);
             } catch (IOException _) {
-                // TODO obsluz wyjatek
+                // empty because of socket timeout
                 continue;
             }
 
@@ -57,6 +67,24 @@ public class ClientHandler extends Thread {
             closeCallByServer();
         }
         System.out.println("### [" + client.getClientSocket().getInetAddress() + "] Handling ended");
+    }
+
+    private boolean isMessageTooBig(String message) {
+        return message.getBytes().length > ProxyConfig.getConfig().getSizeLimit();
+    }
+
+    private void sendRejectToClient() {
+        MessageTransferObject mto = new MessageTransferObject(MessageType.reject, client.getUserId(), "Size", MessageMode.producer);
+        mto.setPayload(new Payload());
+        MessageReceived mr = new MessageReceived(client, MTOJsonParser.parseToString(mto));
+        MessageToSend mts = Feedback.getReject(mr, "Message size is too big");
+
+        DataOutputStream out = new DataOutputStream(client.getOutputStream());
+        try {
+            out.writeUTF(mts.getData());
+        } catch (IOException e) {
+            System.out.println("CLIENT EXCEPTION");
+        }
     }
 
     private void closeCallByClient() {
