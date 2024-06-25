@@ -4,6 +4,7 @@ module org.example.proxyserver {
     requires org.json;
     requires static lombok;
     requires com.google.gson;
+    requires org.apache.commons.net;
 
 
     opens org.example.proxyserver to javafx.fxml;

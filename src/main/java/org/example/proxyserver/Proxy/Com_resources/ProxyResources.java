@@ -6,9 +6,7 @@ import org.example.proxyserver.Proxy.Client;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ProxyResources {
@@ -20,6 +18,10 @@ public class ProxyResources {
     private final Queue<MessageToSend> sendQueue;
     private final SendListener sendListener;
 
+    private final Set<Client> globalClientList;
+    public final static int CLIENT_ADD = 0;
+    public final static int CLIENT_REMOVE = 1;
+
     private static volatile ProxyResources resources;
 
     private ProxyResources(SendListener sendListener) {
@@ -27,6 +29,7 @@ public class ProxyResources {
         this.topics = new ArrayList<>();
         this.receiveQueue = new LinkedBlockingQueue<>();
         this.sendQueue = new LinkedBlockingQueue<>();
+        this.globalClientList = new HashSet<>();
 
         initializeLogs();
     }
@@ -52,6 +55,38 @@ public class ProxyResources {
 
     public Topic getLogs() {
         return logs;
+    }
+
+    public synchronized boolean manageGlobalClientList(int op, Client client) {
+        switch (op) {
+            case CLIENT_ADD -> {
+                if (doesClientWithIdExist(client)) {
+                    return false;
+                } else {
+                    globalClientList.add(client);
+                    return true;
+                }
+            }
+
+            case CLIENT_REMOVE -> {
+                if (doesClientWithIdExist(client)) {
+                    globalClientList.remove(client);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
+    private boolean doesClientWithIdExist(Client client) {
+        for (Client c : globalClientList) {
+            if (c.getUserId().equals(client.getUserId())) return true;
+        }
+        return false;
     }
 
     public void addTopic(Topic topic) {
@@ -111,6 +146,7 @@ public class ProxyResources {
                 try {
                     out.writeUTF(messageToSend.getData());
                 } catch (IOException e) {
+                    // TODO obsluz wyjatek
                     throw new RuntimeException(e);
                 }
                 // wysylaj dane do uzytkownikow

@@ -42,4 +42,29 @@ public class Feedback {
         return new MessageToSend(clients, json);
     }
 
+    public static MessageToSend handshake(Client c, MessageType messageType, String feedback) {
+        Topic logs = ProxyResources.getResources().getLogs();
+        MessageTransferObject mto = new MessageTransferObject(messageType, logs.getUserId(), logs.getTitle(), MessageMode.producer);
+
+        boolean success = messageType == MessageType.acknowledge;
+        mto.setPayload(new Payload(mto.getTimestamp(), "Handshake", success, feedback));
+
+        String json = MTOJsonParser.parseToString(mto);
+        Set<Client> clients = new HashSet<>();
+        clients.add(c);
+        return new MessageToSend(clients, json);
+    }
+
+    public static MessageToSend disconnect(Client c) {
+        Topic logs = ProxyResources.getResources().getLogs();
+        MessageTransferObject mto = new MessageTransferObject(MessageType.status, logs.getUserId(), logs.getTitle(), MessageMode.producer);
+
+        mto.setPayload(new Payload(mto.getTimestamp(), "Disconnect", true, "Disconnect by server"));
+
+        String json = MTOJsonParser.parseToString(mto);
+        Set<Client> clients = new HashSet<>();
+        clients.add(c);
+        return new MessageToSend(clients, json);
+    }
+
 }
