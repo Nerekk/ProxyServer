@@ -3,6 +3,7 @@ package org.example.proxyserver.Proxy.Com_resources;
 import org.example.proxyserver.Gui.Logger;
 import org.example.proxyserver.Interfaces.SendListener;
 import org.example.proxyserver.Proxy.Client;
+import org.example.proxyserver.Proxy.Config.ProxyConfig;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -53,7 +54,7 @@ public class ProxyResources {
     }
 
     private void initializeLogs() {
-        logs = new Topic("logs", "ServerId", null);
+        logs = new Topic("logs", ProxyConfig.getConfig().getServerId(), null);
         topics.add(logs);
     }
 
