@@ -48,6 +48,10 @@ public class ProxyResources {
         }
     }
 
+    public static void cleanResources() {
+        resources = null;
+    }
+
     private void initializeLogs() {
         logs = new Topic("logs", "ServerId", null);
         topics.add(logs);
@@ -104,6 +108,35 @@ public class ProxyResources {
             if (t.getTitle().equals(title)) return t;
         }
         return null;
+    }
+
+    public Set<Topic> findSubscribesOfClient(Client c) {
+        Set<Topic> subs = new HashSet<>();
+
+        for (Topic t : topics) {
+            if (t.getSubscribers().contains(c)) subs.add(t);
+        }
+
+        return subs;
+    }
+
+    public Set<Topic> findProducesOfClient(Client c) {
+        Set<Topic> prods = new HashSet<>();
+
+        for (Topic t : topics) {
+            if (t.getTitle().equals("logs")) continue;
+            if (t.getProducent().equals(c)) prods.add(t);
+        }
+
+        return prods;
+    }
+
+    public void removeClientData(Client c) {
+        Set<Topic> prods = findProducesOfClient(c);
+        prods.forEach(this::removeTopic);
+
+        Set<Topic> subs = findSubscribesOfClient(c);
+        subs.forEach(topic -> topic.removeSubscriber(c));
     }
 
     public synchronized void addMessageReceived(MessageReceived messageReceived) {

@@ -61,6 +61,8 @@ public class ClientHandler extends Thread {
 
     private void closeCallByClient() {
         resources.manageGlobalClientList(ProxyResources.CLIENT_REMOVE, client);
+
+        resources.removeClientData(client);
         try {
             client.getOutputStream().close();
             client.getInputStream().close();

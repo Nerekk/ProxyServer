@@ -34,18 +34,23 @@ public class Status implements TypeHandler {
 
     private MessageToSend getStatus(MessageReceived messageReceived) {
         MessageTransferObject mto = messageReceived.getMto();
-
+        Payload p = mto.getPayload();
         Topic logs = resources.getLogs();
+
+        String reason = p.getTopicOfMessage();
 
         mto.setId(logs.getUserId());
         mto.setTopic(logs.getTitle());
         mto.setTimestamp(LocalDateTime.now());
 
-        Payload p = mto.getPayload();
         p.setTimestampOfMessage(LocalDateTime.now());
-        p.setTopicOfMessage("Status");
         p.setSuccess(true);
-        p.setMessage(getTopics());
+
+        if (reason.equals("My status")) {
+            p.setMessage(getPersonalTopics(messageReceived.getClient()));
+        } else {
+            p.setMessage(getTopics());
+        }
 
         String data = MTOJsonParser.parseToString(mto);
         Set<Client> clients = new HashSet<>();
@@ -61,6 +66,25 @@ public class Status implements TypeHandler {
             String topic = t.getTitle() + " - " + t.getUserId() + "\n";
             topics.append(topic);
         }
+
+        return topics.toString();
+    }
+
+    private String getPersonalTopics(Client c) {
+        StringBuilder topics = new StringBuilder();
+        topics.append("Producer of: \n");
+        Set<Topic> prods = resources.findProducesOfClient(c);
+        prods.forEach(topic -> {
+            String t = topic.getTitle() + "\n";
+            topics.append(t);
+        });
+
+        topics.append("Subscriber of: \n");
+        Set<Topic> subs = resources.findSubscribesOfClient(c);
+        subs.forEach(topic -> {
+            String t = topic.getTitle() + "\n";
+            topics.append(t);
+        });
 
         return topics.toString();
     }

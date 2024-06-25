@@ -65,6 +65,7 @@ public class ProxyServerManager {
 
     public void stop() {
         STOP_SERVER.set(true);
+        ProxyResources.cleanResources();
     }
 
     public void refreshGui() {
