@@ -167,10 +167,6 @@ public class ProxyResources {
         return receiveQueue;
     }
 
-    public Queue<MessageToSend> getSendQueue() {
-        return sendQueue;
-    }
-
     private static SendListener createCallback() {
         return () -> {
             MessageToSend messageToSend = getResources().pollMessageToSend();
@@ -180,10 +176,8 @@ public class ProxyResources {
                 try {
                     out.writeUTF(messageToSend.getData());
                 } catch (IOException e) {
-                    // TODO obsluz wyjatek
-                    throw new RuntimeException(e);
+                    Logger.getInstance().log(Logger.ERROR, "Send to client callback error");
                 }
-                // wysylaj dane do uzytkownikow
             }
         };
     }

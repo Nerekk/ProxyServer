@@ -21,8 +21,7 @@ public class Message implements TypeHandler {
 
     @Override
     public MessageToSend handleSubscriberMode(MessageReceived messageReceived) {
-        // TODO nic nie robi
-        return null;
+        return Feedback.getReject(messageReceived, "Subscriber cannot send message");
     }
 
     @Override

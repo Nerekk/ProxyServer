@@ -83,7 +83,7 @@ public class ClientHandler extends Thread {
         try {
             out.writeUTF(mts.getData());
         } catch (IOException e) {
-            System.out.println("CLIENT EXCEPTION");
+            System.out.println("sendRejectToClient EXCEPTION");
         }
     }
 
@@ -96,7 +96,7 @@ public class ClientHandler extends Thread {
             client.getInputStream().close();
             client.getClientSocket().close();
         } catch (IOException e) {
-            System.out.println("CLIENT EXCEPTION");
+            System.out.println("closeCallByClient EXCEPTION");
         }
     }
     private void closeCallByServer() {
@@ -111,7 +111,7 @@ public class ClientHandler extends Thread {
             client.getInputStream().close();
             client.getClientSocket().close();
         } catch (IOException e) {
-            System.out.println("CLIENT EXCEPTION");
+            System.out.println("closeCallByServer EXCEPTION");
         }
     }
 

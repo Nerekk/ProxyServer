@@ -27,7 +27,7 @@ public class MessageManager {
     }
 
     public void handleMessageReceived() {
-        MessageReceived messageReceived = resources.getReceiveQueue().poll();
+        MessageReceived messageReceived = resources.pollMessageReceived();
         MessageTransferObject mto;
         try {
             String data = messageReceived.getJsonData();
@@ -35,14 +35,13 @@ public class MessageManager {
             messageReceived.setMto(mto);
         } catch (MessageException e) {
             System.out.println(e.getMessage());
-            // TODO wygeneruj nowy komunikat
+            Feedback.getReject(messageReceived, "Message is invalid, could not be parsed");
         }
 
 
         MessageToSend toSend = manageObject(messageReceived);
         System.out.println(toSend.getData());
         resources.addMessageToSend(toSend);
-        // wyslij do kolejki wyslania
     }
 
     private MessageTransferObject parseMessage(String data) throws MessageException {
@@ -51,7 +50,6 @@ public class MessageManager {
         try {
             mto = MTOJsonParser.parseJsonToMessageTransferObject(data);
         } catch (JsonParseException | IllegalArgumentException e) {
-            // blad json
             throw new MessageException(e.getMessage());
         }
         return mto;

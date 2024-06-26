@@ -9,7 +9,6 @@ import java.net.Socket;
 @Getter
 @Setter
 public class Client {
-    // TODO ustawianie userId w odpowiednim momencie
     private String userId;
 
     private Socket clientSocket;
