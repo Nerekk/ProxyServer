@@ -1,7 +1,9 @@
 package org.example.proxyserver.Threads;
 
+import javafx.application.Platform;
 import org.apache.commons.net.util.SubnetUtils;
 import org.example.proxyserver.Enums.MessageType;
+import org.example.proxyserver.Gui.Logger;
 import org.example.proxyserver.Proxy.Client;
 import org.example.proxyserver.Proxy.Com_resources.MessageToSend;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
@@ -55,7 +57,8 @@ public class ProxyServerThread extends Thread {
             return;
         }
 
-        System.out.println("## [" + listenerSocket.getInetAddress() + "] Client accepted: " + clientSocket.getInetAddress());
+//        System.out.println("## [" + listenerSocket.getInetAddress() + "] Client accepted: " + clientSocket.getInetAddress());
+        Platform.runLater(() -> Logger.getInstance().log(Logger.INFO, "## [" + listenerSocket.getInetAddress() + "] Client accepted: " + clientSocket.getInetAddress()));
         clientSocket.setSoTimeout(ProxyConfig.getConfig().getTimeOut());
 
         ClientHandler clientHandler = new ClientHandler(c, resources, STOP_CLIENT);
