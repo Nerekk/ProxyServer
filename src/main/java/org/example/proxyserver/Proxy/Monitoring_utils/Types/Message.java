@@ -7,6 +7,7 @@ import org.example.proxyserver.Proxy.Com_resources.MessageToSend;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
 import org.example.proxyserver.Proxy.Com_resources.Topic;
 import org.example.proxyserver.Proxy.Com_resources.Transfer.MessageTransferObject;
+import org.example.proxyserver.Proxy.Com_resources.Transfer.Payload;
 import org.example.proxyserver.Proxy.Monitoring_utils.Feedback;
 
 import java.util.Set;
@@ -27,22 +28,23 @@ public class Message implements TypeHandler {
     @Override
     public MessageToSend handleProducerMode(MessageReceived messageReceived) {
         Topic t = getTopic(messageReceived);
-        if (t == null) {
-            return Feedback.getReject(messageReceived, "Topic does not exist");
-        }
-        if (t.getProducent() != messageReceived.getClient()) {
-            return Feedback.getReject(messageReceived, "You are not topic owner");
-        }
-        if (t.getSubscribers().isEmpty()) {
-            return Feedback.getReject(messageReceived, "No subscribers in this topic");
-        }
-
+        if (t == null) return Feedback.getReject(messageReceived, "Topic does not exist");
+        if (t.getProducent() != messageReceived.getClient()) return Feedback.getReject(messageReceived, "You are not topic owner");
+        if (t.getSubscribers().isEmpty()) return Feedback.getReject(messageReceived, "No subscribers in this topic");
+        if (isEmpty(messageReceived)) return Feedback.getReject(messageReceived, "Message and its topic must not be empty");
 
         Set<Client> clients = t.getSubscribers();
         String data = messageReceived.getJsonData();
 
         ProxyResources.getResources().addMessageToSend(new MessageToSend(clients, data));
         return Feedback.getAcknowledge(messageReceived, "Message sent to " + clients.size() + " subscribers");
+    }
+
+    private boolean isEmpty(MessageReceived messageReceived) {
+        MessageTransferObject mto = messageReceived.getMto();
+        Payload p = mto.getPayload();
+
+        return p.getTopicOfMessage().isEmpty() || p.getMessage().isEmpty();
     }
 
     private Topic getTopic(MessageReceived messageReceived) {

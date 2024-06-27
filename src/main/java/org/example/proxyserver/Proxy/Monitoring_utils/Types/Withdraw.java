@@ -32,7 +32,7 @@ public class Withdraw implements TypeHandler {
     public MessageToSend handleProducerMode(MessageReceived messageReceived) {
         Topic t = getTopic(messageReceived);
         if (t == null) return Feedback.getReject(messageReceived, "Topic with this name does not exist");
-
+        if (t.getProducent() != messageReceived.getClient()) return Feedback.getReject(messageReceived, "You are not topic owner");
         resources.removeTopic(t);
 
         return Feedback.getAcknowledge(messageReceived, "Topic deleted");

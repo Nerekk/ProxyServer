@@ -40,12 +40,19 @@ public class Register implements TypeHandler {
     @Override
     public MessageToSend handleProducerMode(MessageReceived messageReceived) {
         Topic t = getTopic(messageReceived);
-        if (t != null) {
-            return Feedback.getReject(messageReceived, "Topic with this name already exists");
-        }
+        if (t != null) return Feedback.getReject(messageReceived, "Topic with this name already exists");
+
+        if (isEmpty(messageReceived)) return Feedback.getReject(messageReceived, "Topic name cannot be empty");
+
         addNewTopic(messageReceived);
 
         return Feedback.getAcknowledge(messageReceived, "Topic added");
+    }
+
+    private boolean isEmpty(MessageReceived messageReceived) {
+        MessageTransferObject mto = messageReceived.getMto();
+
+        return mto.getTopic().isEmpty();
     }
 
     private Topic getTopic(MessageReceived messageReceived) {
