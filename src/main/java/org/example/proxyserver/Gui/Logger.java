@@ -59,7 +59,7 @@ public class Logger {
             }
 
             for (Client c : t.getSubscribers()) {
-                topics.appendText("\t- " + c.getUserId() + "\n");
+                topics.appendText("--- " + c.getUserId() + "\n");
             }
         }
     }

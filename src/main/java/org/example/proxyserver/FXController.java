@@ -54,6 +54,7 @@ public class FXController implements Initializable {
     @FXML
     protected void refresh() {
         manager.refreshGui();
+        logger.log(Logger.INFO, "Refreshed");
     }
 
     private void swapButtonStatus() {

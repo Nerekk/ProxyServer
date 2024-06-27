@@ -2,6 +2,7 @@ package org.example.proxyserver.Proxy.Config;
 
 
 import org.example.proxyserver.Exceptions.ConfigException;
+import org.example.proxyserver.Gui.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,6 +42,7 @@ public class ProxyConfig {
                 config = new ProxyConfig(json);
                 validate(config);
                 } catch (ConfigException | IOException e) {
+                    Logger.getInstance().log(Logger.ERROR, "Your config is invalid!");
                     throw new RuntimeException(e);
                 }
             }
