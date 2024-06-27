@@ -63,10 +63,9 @@ public class MessageManager {
             case withdraw -> {
                 return handleType(withdraw, messageReceived);
             }
-            case message -> {
+            case message, file -> {
                 return handleType(message, messageReceived);
             }
-//            case file -> file(messageReceived);
             case config -> {
                 return handleType(config, messageReceived);
             }
