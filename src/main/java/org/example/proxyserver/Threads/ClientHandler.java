@@ -48,7 +48,7 @@ public class ClientHandler extends Thread {
                 }
 
                 System.out.println(jsonData);
-            } catch (IOException _) {
+            } catch (IOException e) {
                 // empty because of socket timeout
                 continue;
             }

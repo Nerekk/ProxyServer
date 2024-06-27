@@ -37,7 +37,7 @@ public class ProxyServerThread extends Thread {
         while (!STOP_SERVER.get()) {
             try {
                 handleAccept();
-            } catch (IOException _) {}
+            } catch (IOException e) {}
         }
         close();
     }
