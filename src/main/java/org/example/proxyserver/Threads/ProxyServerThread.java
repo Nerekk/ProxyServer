@@ -35,16 +35,12 @@ public class ProxyServerThread extends Thread {
         while (!STOP_SERVER.get()) {
             try {
                 handleAccept();
-            } catch (IOException e) {
-                // OBSLUGA INNYCH WYJATKOW NIZ TIME OUT
-                System.out.println(e.getMessage());
-            }
+            } catch (IOException _) {}
         }
         close();
     }
 
     private void handleAccept() throws IOException {
-        System.out.println("## [" + listenerSocket.getInetAddress() + "] Listening..");
         Socket clientSocket = listenerSocket.accept();
 
         Client c = new Client(clientSocket);
@@ -58,7 +54,6 @@ public class ProxyServerThread extends Thread {
 
             return;
         }
-        // SPRAWDZ CZY NALEZY DO ALLOWED IP ADDRESSES
 
         System.out.println("## [" + listenerSocket.getInetAddress() + "] Client accepted: " + clientSocket.getInetAddress());
         clientSocket.setSoTimeout(ProxyConfig.getConfig().getTimeOut());

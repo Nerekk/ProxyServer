@@ -1,5 +1,6 @@
 package org.example.proxyserver.Proxy.Com_resources;
 
+import javafx.application.Platform;
 import org.example.proxyserver.Gui.Logger;
 import org.example.proxyserver.Interfaces.SendListener;
 import org.example.proxyserver.Proxy.Client;
@@ -94,14 +95,18 @@ public class ProxyResources {
         return false;
     }
 
+    private void log(String message) {
+        Platform.runLater(() -> Logger.getInstance().log(Logger.INFO, message));
+    }
+
     public void addTopic(Topic topic) {
         topics.add(topic);
-        Logger.getInstance().log(Logger.INFO, "Topic " + topic.getTitle() + " added!");
+        log("Topic " + topic.getTitle() + " added!");
     }
 
     public void removeTopic(Topic topic) {
         topics.remove(topic);
-        Logger.getInstance().log(Logger.INFO, "Topic " + topic.getTitle() + " deleted!");
+        log("Topic " + topic.getTitle() + " deleted!");
     }
 
     public Topic findTopicByTitle(String title) {
@@ -142,12 +147,12 @@ public class ProxyResources {
 
     public synchronized void addMessageReceived(MessageReceived messageReceived) {
         receiveQueue.add(messageReceived);
-        Logger.getInstance().log(Logger.INFO, "New message received from " + messageReceived.getClient().getUserId());
+        log("New message received from " + messageReceived.getClient().getUserId());
     }
 
     public synchronized void addMessageToSend(MessageToSend messageToSend) {
         sendQueue.add(messageToSend);
-        Logger.getInstance().log(Logger.INFO, "New message moved to send!");
+        log("New message moved to send!");
         sendListener.callSend();
     }
 
@@ -176,7 +181,7 @@ public class ProxyResources {
                 try {
                     out.writeUTF(messageToSend.getData());
                 } catch (IOException e) {
-                    Logger.getInstance().log(Logger.ERROR, "Send to client callback error");
+                    Platform.runLater(() -> Logger.getInstance().log(Logger.ERROR, "Send to client callback error"));
                 }
             }
         };

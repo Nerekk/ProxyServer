@@ -1,5 +1,6 @@
 package org.example.proxyserver.Proxy;
 
+import javafx.application.Platform;
 import org.example.proxyserver.FXController;
 import org.example.proxyserver.Gui.Logger;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
@@ -57,7 +58,7 @@ public class ProxyServerManager {
         } else {
             createListenedSockets();
         }
-        refreshGui();
+        Platform.runLater(this::refreshGui);
 
         launchSockets();
         monitoring = new MonitoringThread(config, resources, STOP_SERVER);
@@ -71,13 +72,15 @@ public class ProxyServerManager {
     public void refreshGui() {
         c.logger.logServers(listenPort, listenAddresses);
         c.logger.logTopics(resources.getTopics());
-        c.logger.log(Logger.INFO, "Refreshed");
+    }
+
+    public static void refreshTopics() {
+        Platform.runLater(() -> Logger.getInstance().logTopics(ProxyResources.getResources().getTopics()));
     }
 
     private void launchSockets() {
         servers.forEach(Thread::start);
 
-//        System.out.println("#Launching sockets..");
         c.logger.log(Logger.INFO, "Launching sockets..");
     }
 
@@ -86,7 +89,6 @@ public class ProxyServerManager {
             ServerSocket socket = buildSocket(address, listenPort);
             servers.add(new ProxyServerThread(socket, resources, STOP_SERVER));
 
-//            System.out.println("#Created socket for " + address);
             c.logger.log(Logger.INFO, "Created socket for " + address);
         }
     }
@@ -104,7 +106,6 @@ public class ProxyServerManager {
         ServerSocket socket = buildGeneralSocket(listenPort);
         servers.add(new ProxyServerThread(socket, resources, STOP_SERVER));
 
-//        System.out.println("#Created socket for GENERAL");
         c.logger.log(Logger.INFO, "Created socket for general address");
     }
 

@@ -10,12 +10,12 @@ import org.example.proxyserver.Proxy.Com_resources.Transfer.MessageTransferObjec
 import org.example.proxyserver.Proxy.Com_resources.Transfer.Payload;
 import org.example.proxyserver.Proxy.Config.ProxyConfig;
 import org.example.proxyserver.Proxy.Monitoring_utils.Feedback;
+import org.example.proxyserver.Proxy.ProxyServerManager;
 import org.example.proxyserver.Proxy.Utils.MTOJsonParser;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientHandler extends Thread {
@@ -91,6 +91,7 @@ public class ClientHandler extends Thread {
         resources.manageGlobalClientList(ProxyResources.CLIENT_REMOVE, client);
 
         resources.removeClientData(client);
+        ProxyServerManager.refreshTopics();
         try {
             client.getOutputStream().close();
             client.getInputStream().close();

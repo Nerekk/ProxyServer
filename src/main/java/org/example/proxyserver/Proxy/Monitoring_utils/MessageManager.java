@@ -9,6 +9,7 @@ import org.example.proxyserver.Proxy.Com_resources.MessageToSend;
 import org.example.proxyserver.Proxy.Com_resources.ProxyResources;
 import org.example.proxyserver.Proxy.Com_resources.Transfer.MessageTransferObject;
 import org.example.proxyserver.Proxy.Monitoring_utils.Types.*;
+import org.example.proxyserver.Proxy.ProxyServerManager;
 import org.example.proxyserver.Proxy.Utils.MTOJsonParser;
 
 public class MessageManager {
@@ -92,6 +93,7 @@ public class MessageManager {
         } else {
             result = Feedback.getReject(messageReceived, "Unknown mode");
         }
+        ProxyServerManager.refreshTopics();
         return result;
     }
 }
